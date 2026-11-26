@@ -6,7 +6,7 @@
 <title>HBD</title>
 <style>
   :root {
-    --bg: #f3ecdc;
+    --bg: #fde7cd;
     --ink: #000;
     --font: "Arial Black", "Helvetica Neue", Helvetica, Arial, sans-serif;
     --margin: clamp(12px, 3vmin, 32px);
@@ -29,7 +29,10 @@
     z-index: 0;
     overflow: hidden;
     pointer-events: none;
-    background: var(--bg);
+    /* Soft Vice City sunset: lavender > pink > coral > apricot > cream */
+    background: linear-gradient(180deg, #b9a5dc 0%, #e8a6cb 26%, #f6a392 52%, #fbc89a 76%, #fde7cd 100%);
+    background-size: 100% 220%;
+    animation: sky 20s ease-in-out infinite alternate;
   }
   .bg i {
     position: absolute;
@@ -37,20 +40,11 @@
     border-radius: 50%;
     will-change: transform;
   }
+  /* One soft sun glow drifting across the sky */
   .bg i:nth-child(1) {
-    width: 75vmax; height: 75vmax; left: -25vmax; top: -25vmax;
-    background: radial-gradient(circle, rgba(248, 211, 166, .85) 0, rgba(248, 211, 166, 0) 65%);
-    animation: drift-a 28s ease-in-out infinite alternate;
-  }
-  .bg i:nth-child(2) {
-    width: 80vmax; height: 80vmax; right: -30vmax; bottom: -30vmax;
-    background: radial-gradient(circle, rgba(244, 190, 178, .8) 0, rgba(244, 190, 178, 0) 65%);
-    animation: drift-b 34s ease-in-out infinite alternate;
-  }
-  .bg i:nth-child(3) {
-    width: 60vmax; height: 60vmax; left: 20%; top: 25%;
-    background: radial-gradient(circle, rgba(243, 230, 160, .8) 0, rgba(243, 230, 160, 0) 65%);
-    animation: drift-c 40s ease-in-out infinite alternate;
+    width: 80vmax; height: 80vmax; left: 10vmax; bottom: -40vmax;
+    background: radial-gradient(circle, rgba(255, 224, 150, .75) 0, rgba(255, 224, 150, 0) 62%);
+    animation: sun 24s ease-in-out infinite alternate;
   }
   .bg::after { /* faint paper grain */
     content: "";
@@ -58,9 +52,8 @@
     inset: 0;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .15 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-  @keyframes drift-a { to { transform: translate(30vmax, 22vmax) scale(1.2); } }
-  @keyframes drift-b { to { transform: translate(-28vmax, -20vmax) scale(1.15); } }
-  @keyframes drift-c { to { transform: translate(-22vmax, 16vmax) scale(.85); } }
+  @keyframes sky { to { background-position: 0 100%; } }
+  @keyframes sun { to { transform: translate(35vmax, -18vmax) scale(1.15); } }
 
   main { position: relative; z-index: 1; }
   .page {
@@ -228,7 +221,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .bg i, .entry.shake, .wall .row { animation: none; }
+    .bg, .bg i, .entry.shake, .wall .row { animation: none; }
     .entry, .entry button, .entry button svg { transition: none; }
   }
 </style>
@@ -237,7 +230,7 @@
 
 <!-- 26.302520, 73.092023 -->
 
-<div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="bg" aria-hidden="true"><i></i></div>
 
 <main id="entry-view">
   <!-- Section 1: opening screen (only visible text: HBD) -->
