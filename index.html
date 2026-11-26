@@ -22,16 +22,52 @@
   }
   html { scroll-snap-type: y proximity; }
 
-  /* Soft cream background with a faint paper grain (inline, no external assets) */
+  /* ---------- Animated background (shared by every screen) ---------- */
+  .bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background: var(--bg);
+  }
+  .bg i {
+    position: absolute;
+    display: block;
+    border-radius: 50%;
+    will-change: transform;
+  }
+  .bg i:nth-child(1) {
+    width: 75vmax; height: 75vmax; left: -25vmax; top: -25vmax;
+    background: radial-gradient(circle, rgba(248, 211, 166, .85) 0, rgba(248, 211, 166, 0) 65%);
+    animation: drift-a 28s ease-in-out infinite alternate;
+  }
+  .bg i:nth-child(2) {
+    width: 80vmax; height: 80vmax; right: -30vmax; bottom: -30vmax;
+    background: radial-gradient(circle, rgba(244, 190, 178, .8) 0, rgba(244, 190, 178, 0) 65%);
+    animation: drift-b 34s ease-in-out infinite alternate;
+  }
+  .bg i:nth-child(3) {
+    width: 60vmax; height: 60vmax; left: 20%; top: 25%;
+    background: radial-gradient(circle, rgba(243, 230, 160, .8) 0, rgba(243, 230, 160, 0) 65%);
+    animation: drift-c 40s ease-in-out infinite alternate;
+  }
+  .bg::after { /* faint paper grain */
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .15 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  @keyframes drift-a { to { transform: translate(30vmax, 22vmax) scale(1.2); } }
+  @keyframes drift-b { to { transform: translate(-28vmax, -20vmax) scale(1.15); } }
+  @keyframes drift-c { to { transform: translate(-22vmax, 16vmax) scale(.85); } }
+
+  main { position: relative; z-index: 1; }
   .page {
     min-height: 100vh;
     min-height: 100svh;
     width: 100%;
     scroll-snap-align: start;
-    background-color: var(--bg);
-    background-image:
-      radial-gradient(ellipse at 50% 40%, rgba(255,255,255,.55), rgba(255,255,255,0) 70%),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .15 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   /* ---------- Section 1: HBD ---------- */
@@ -60,46 +96,55 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: clamp(20px, 4vmin, 36px);
+    gap: clamp(22px, 4vmin, 38px);
     text-align: center;
   }
   .hint {
     margin: 0;
-    font-size: clamp(1.25rem, 5vw, 2.5rem);
+    font-size: clamp(1.15rem, 4.6vw, 2.25rem);
     font-weight: 900;
-    letter-spacing: .12em;
+    letter-spacing: .1em;
   }
+
+  /* Polished pill-shaped code field */
   .entry {
     display: flex;
     align-items: center;
-    gap: 12px;
-    width: min(100%, 460px);
+    gap: 8px;
+    width: min(100%, 480px);
+    padding: 7px 7px 7px 26px;
+    background: rgba(255, 255, 255, .6);
+    border: 2.5px solid var(--ink);
+    border-radius: 999px;
+    box-shadow: 5px 5px 0 var(--ink);
+    transition: box-shadow .18s ease, transform .18s ease, background-color .18s ease;
+  }
+  .entry:focus-within {
+    background: rgba(255, 255, 255, .85);
+    box-shadow: 8px 8px 0 var(--ink);
+    transform: translate(-2px, -2px);
+    outline: 3px solid var(--ink);
+    outline-offset: 4px;
   }
   .entry input {
     flex: 1 1 auto;
     min-width: 0;
-    padding: 10px 2px;
-    font: inherit;
-    font-size: clamp(1.25rem, 5vw, 1.75rem);
+    padding: 10px 0;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: clamp(1.2rem, 4.8vw, 1.6rem);
     font-weight: 700;
-    letter-spacing: .06em;
+    letter-spacing: .08em;
     color: var(--ink);
     background: transparent;
     border: 0;
-    border-bottom: 3px solid var(--ink);
     border-radius: 0;
-    text-align: center;
-  }
-  .entry input:focus-visible,
-  .entry button:focus-visible,
-  .wall a:focus-visible {
-    outline: 3px solid var(--ink);
-    outline-offset: 4px;
+    outline: none;
+    caret-color: var(--ink);
   }
   .entry button {
     flex: 0 0 auto;
-    width: 52px;
-    height: 52px;
+    width: 54px;
+    height: 54px;
     display: grid;
     place-items: center;
     padding: 0;
@@ -108,14 +153,28 @@
     border: 0;
     border-radius: 50%;
     cursor: pointer;
+    transition: transform .15s ease;
   }
-  .entry button svg { width: 26px; height: 26px; }
+  .entry button:hover svg { transform: translateX(3px); }
+  .entry button:active { transform: scale(.93); }
+  .entry button:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 3px;
+  }
+  .entry button svg { width: 26px; height: 26px; transition: transform .15s ease; }
+  .entry.shake { animation: shake .4s ease; }
+  @keyframes shake {
+    20% { transform: translateX(-7px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(3px); }
+  }
   .feedback {
     margin: 0;
     min-height: 1.5em;
     font-family: Helvetica, Arial, sans-serif;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
   }
 
   /* ---------- Reveal ---------- */
@@ -132,7 +191,7 @@
     display: grid;
     padding: 0 var(--pad, 12px);
     line-height: 1;
-    font-size: var(--fs, 48px);
+    font-size: var(--fs, 32px);
     font-weight: 900;
     white-space: nowrap;
   }
@@ -142,22 +201,43 @@
     justify-content: space-between;
     min-width: 0;
     overflow: hidden;
+    animation: row-in .6s ease both;
+    animation-delay: calc(var(--i, 0) * 30ms);
   }
+  .wall.instant .row { animation: none; }
+  @keyframes row-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+  .wall .row.solo { justify-content: center; }
   .wall a {
-    display: inline-block;
-    padding: .12em .35em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: .2em .6em;
     color: var(--bg);
     background: var(--ink);
+    border-radius: 999px;
     text-decoration: none;
     text-align: center;
   }
-  .wall .row.solo { justify-content: center; }
+  .wall a:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 4px;
+  }
 
+  @media (prefers-reduced-motion: reduce) {
+    .bg i, .entry.shake, .wall .row { animation: none; }
+    .entry, .entry button, .entry button svg { transition: none; }
+  }
 </style>
 </head>
 <body>
 
 <!-- 26.302520, 73.092023 -->
+
+<div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
 
 <main id="entry-view">
   <!-- Section 1: opening screen (only visible text: HBD) -->
@@ -171,7 +251,7 @@
 
   <!-- Section 2: clue + code entry (revealed by scrolling) -->
   <section class="page clue" id="clue">
-    <p class="hint" id="hint">CONTACT NUMBER</p>
+    <p class="hint" id="hint">HINT: CONTACT NUMBER</p>
     <form class="entry" id="code-form" autocomplete="off" novalidate>
       <input id="code" name="code" type="text" inputmode="tel" autocomplete="off"
              autocapitalize="off" autocorrect="off" spellcheck="false"
@@ -188,7 +268,7 @@
 </main>
 
 <!-- Birthday reveal (shown after the correct code) -->
-<section class="reveal page" id="reveal" hidden aria-label="HBD">
+<section class="reveal" id="reveal" hidden aria-label="HBD">
   <div class="wall" id="wall"></div>
 </section>
 
@@ -200,9 +280,9 @@
      CONFIGURATION: edit these three values, nothing else needs to change.
      ===================================================================== */
 
-  // 1) ACCEPTED CODE: replace the placeholder below with the chosen contact
-  //    number, e.g. "09876543210". Spaces, dashes, dots, brackets and "+" in
-  //    what people type are ignored; only the digits are compared.
+  // 1) ACCEPTED CODE: replace with the chosen contact number if it ever changes.
+  //    Spaces, dashes, dots, brackets and "+" typed by visitors are ignored;
+  //    only the digits are compared.
   var ACCEPTED_CODE = "9571709991";
 
   // 2) DRIVE LINK URL: replace the placeholder with your full Drive link,
@@ -215,9 +295,8 @@
 
   /* ===================================================================== */
 
-  // Digits-only comparison for phone numbers (text, never a number type, so
-  // leading zeros survive). If the configured code has no digits (i.e. it is
-  // still the placeholder), fall back to an exact, case-insensitive text match.
+  // Digits-only comparison (text, never a number, so leading zeros survive).
+  // If the configured code has no digits, fall back to an exact text match.
   function normalize(value) {
     var digits = String(value).replace(/\D/g, "");
     return digits.length ? digits : String(value).replace(/[\s\-.()+]/g, "").toUpperCase();
@@ -239,10 +318,15 @@
     } else {
       feedback.textContent = "Not quite\u2014try again.";
       input.setAttribute("aria-invalid", "true");
+      form.classList.remove("shake");
+      void form.offsetWidth; // restart the animation
+      form.classList.add("shake");
       input.focus();
       input.select();
     }
   });
+
+  form.addEventListener("animationend", function () { form.classList.remove("shake"); });
 
   input.addEventListener("input", function () {
     feedback.textContent = "";
@@ -255,7 +339,7 @@
     reveal.hidden = false;
     document.body.classList.add("revealed");
     window.scrollTo(0, 0);
-    buildWall();
+    buildWall(true);
     var link = wall.querySelector("a");
     if (link) link.focus({ preventScroll: true });
   }
@@ -266,32 +350,38 @@
     return s;
   }
 
-  function buildWall() {
+  function buildWall(animate) {
     var w = window.innerWidth, h = window.innerHeight;
-    var cols = w < 520 ? 3 : w < 900 ? 4 : w < 1300 ? 5 : 6;
+    // More, smaller HBDs: dense wallpaper on every screen size.
+    var cols = w < 520 ? 5 : w < 900 ? 7 : w < 1300 ? 9 : 12;
     var pad = Math.round(w * 0.03);
     var fs = (w - 2 * pad) / (cols * 2.5);
-    var rows = Math.max(3, Math.round(h / (fs * 1.15)));
+    var rows = Math.max(5, Math.round(h / (fs * 1.15)));
     var linkRow = Math.floor(rows / 2);
     var label = DRIVE_LINK_LABEL;
 
     wall.innerHTML = "";
+    wall.classList.toggle("instant", !animate);
     wall.style.setProperty("--fs", fs + "px");
     wall.style.setProperty("--pad", pad + "px");
-    wall.style.gridTemplateRows = "repeat(" + rows + ", 1fr)";
+    var tracks = [];
+    for (var t = 0; t < rows; t++) tracks.push(t === linkRow ? "minmax(48px, 1fr)" : "1fr");
+    wall.style.gridTemplateRows = tracks.join(" ");
 
-    // Fit the link text: share a row with HBD if it fits, otherwise use a full row.
+    // Fit the link text: share the row with HBDs if it fits, otherwise use the full row.
     var hbdW = fs * 2.4;
     var sharedAvail = w - 2 * pad - 2 * hbdW - 2 * fs * 0.3;
-    var sharedFs = Math.min(fs, sharedAvail / (label.length * 0.85 + 1));
-    var solo = sharedFs < fs * 0.5;
+    var sharedFs = Math.min(fs * 1.4, sharedAvail / (label.length * 0.85 + 1.5));
+    var solo = sharedFs < 14;
     var linkFs = solo
-      ? Math.min(fs * 0.9, (w - 2 * pad) / (label.length * 0.85 + 1))
+      ? Math.min(fs * 1.4, (w - 2 * pad) / (label.length * 0.85 + 1.5))
       : sharedFs;
+    linkFs = Math.max(linkFs, 13);
 
     for (var r = 0; r < rows; r++) {
       var row = document.createElement("div");
       row.className = "row";
+      row.style.setProperty("--i", r);
       if (r === linkRow) {
         var a = document.createElement("a");
         a.textContent = label;
@@ -307,9 +397,10 @@
           row.classList.add("solo");
           row.appendChild(a);
         } else {
-          row.appendChild(cell("HBD"));
+          var half = Math.floor(cols / 2);
+          for (var k = 0; k < half; k++) row.appendChild(cell("HBD"));
           row.appendChild(a);
-          row.appendChild(cell("HBD"));
+          for (var m = 0; m < half; m++) row.appendChild(cell("HBD"));
         }
       } else {
         for (var c = 0; c < cols; c++) row.appendChild(cell("HBD"));
@@ -322,7 +413,7 @@
   window.addEventListener("resize", function () {
     if (!revealed) return;
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(buildWall, 100);
+    resizeTimer = setTimeout(function () { buildWall(false); }, 100);
   });
 })();
 </script>
