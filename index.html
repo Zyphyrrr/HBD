@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HBD</title>
+<style>
+  :root {
+    --bg: #f3ecdc;
+    --ink: #000;
+    --font: "Arial Black", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --margin: clamp(12px, 3vmin, 32px);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font);
+  }
+  html { scroll-snap-type: y proximity; }
+
+  /* Soft cream background with a faint paper grain (inline, no external assets) */
+  .page {
+    min-height: 100vh;
+    min-height: 100svh;
+    width: 100%;
+    scroll-snap-align: start;
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(ellipse at 50% 40%, rgba(255,255,255,.55), rgba(255,255,255,0) 70%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .15 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- Section 1: HBD ---------- */
+  .opening {
+    height: 100vh;
+    height: 100svh;
+    padding: var(--margin);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .opening h1 { margin: 0; width: 100%; height: 100%; }
+  .opening svg { display: block; width: 100%; height: 100%; }
+  .opening text {
+    font-family: var(--font);
+    font-weight: 900;
+    fill: var(--ink);
+  }
+
+  /* ---------- Section 2: clue + code ---------- */
+  .clue {
+    height: 100vh;
+    height: 100svh;
+    padding: var(--margin);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(20px, 4vmin, 36px);
+    text-align: center;
+  }
+  .hint {
+    margin: 0;
+    font-size: clamp(1.25rem, 5vw, 2.5rem);
+    font-weight: 900;
+    letter-spacing: .12em;
+  }
+  .entry {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: min(100%, 460px);
+  }
+  .entry input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 10px 2px;
+    font: inherit;
+    font-size: clamp(1.25rem, 5vw, 1.75rem);
+    font-weight: 700;
+    letter-spacing: .06em;
+    color: var(--ink);
+    background: transparent;
+    border: 0;
+    border-bottom: 3px solid var(--ink);
+    border-radius: 0;
+    text-align: center;
+  }
+  .entry input:focus-visible,
+  .entry button:focus-visible,
+  .wall a:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 4px;
+  }
+  .entry button {
+    flex: 0 0 auto;
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    color: var(--bg);
+    background: var(--ink);
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .entry button svg { width: 26px; height: 26px; }
+  .feedback {
+    margin: 0;
+    min-height: 1.5em;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  /* ---------- Reveal ---------- */
+  body.revealed { overflow: hidden; height: 100%; }
+  .reveal {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    overflow: hidden;
+  }
+  .reveal[hidden] { display: none; }
+  .wall {
+    height: 100%;
+    display: grid;
+    padding: 0 var(--pad, 12px);
+    line-height: 1;
+    font-size: var(--fs, 48px);
+    font-weight: 900;
+    white-space: nowrap;
+  }
+  .wall .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .wall a {
+    display: inline-block;
+    padding: .12em .35em;
+    color: var(--bg);
+    background: var(--ink);
+    text-decoration: none;
+    text-align: center;
+  }
+  .wall .row.solo { justify-content: center; }
+
+</style>
+</head>
+<body>
+
+<!-- 26.302520, 73.092023 -->
+
+<main id="entry-view">
+  <!-- Section 1: opening screen (only visible text: HBD) -->
+  <section class="page opening">
+    <h1 aria-label="HBD">
+      <svg viewBox="0 0 300 125" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+        <text transform="translate(15 111) scale(1 1.35)" x="0" y="0" font-size="100" textLength="270" lengthAdjust="spacingAndGlyphs">HBD</text>
+      </svg>
+    </h1>
+  </section>
+
+  <!-- Section 2: clue + code entry (revealed by scrolling) -->
+  <section class="page clue" id="clue">
+    <p class="hint" id="hint">CONTACT NUMBER</p>
+    <form class="entry" id="code-form" autocomplete="off" novalidate>
+      <input id="code" name="code" type="text" inputmode="tel" autocomplete="off"
+             autocapitalize="off" autocorrect="off" spellcheck="false"
+             aria-labelledby="hint" aria-describedby="feedback">
+      <button type="submit" aria-label="Submit code">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 12h15M13 6l6 6-6 6"/>
+        </svg>
+      </button>
+    </form>
+    <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+  </section>
+</main>
+
+<!-- Birthday reveal (shown after the correct code) -->
+<section class="reveal page" id="reveal" hidden aria-label="HBD">
+  <div class="wall" id="wall"></div>
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =====================================================================
+     CONFIGURATION: edit these three values, nothing else needs to change.
+     ===================================================================== */
+
+  // 1) ACCEPTED CODE: replace the placeholder below with the chosen contact
+  //    number, e.g. "09876543210". Spaces, dashes, dots, brackets and "+" in
+  //    what people type are ignored; only the digits are compared.
+  var ACCEPTED_CODE = "9571709991";
+
+  // 2) DRIVE LINK URL: replace the placeholder with your full Drive link,
+  //    e.g. "https://drive.google.com/...". It opens in a new tab.
+  var DRIVE_LINK_URL = "https://example.invalid/DRIVE_URL_PLACEHOLDER";
+
+  // 3) DRIVE LINK TEXT: the text shown among the repeated HBD lines.
+  //    Replace DRIVE_LINK_GOES_HERE with any short text you like (or keep it).
+  var DRIVE_LINK_LABEL = "DRIVE_LINK_GOES_HERE";
+
+  /* ===================================================================== */
+
+  // Digits-only comparison for phone numbers (text, never a number type, so
+  // leading zeros survive). If the configured code has no digits (i.e. it is
+  // still the placeholder), fall back to an exact, case-insensitive text match.
+  function normalize(value) {
+    var digits = String(value).replace(/\D/g, "");
+    return digits.length ? digits : String(value).replace(/[\s\-.()+]/g, "").toUpperCase();
+  }
+
+  var form = document.getElementById("code-form");
+  var input = document.getElementById("code");
+  var feedback = document.getElementById("feedback");
+  var entryView = document.getElementById("entry-view");
+  var reveal = document.getElementById("reveal");
+  var wall = document.getElementById("wall");
+  var revealed = false;
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var entered = normalize(input.value);
+    if (entered && entered === normalize(ACCEPTED_CODE)) {
+      showReveal();
+    } else {
+      feedback.textContent = "Not quite\u2014try again.";
+      input.setAttribute("aria-invalid", "true");
+      input.focus();
+      input.select();
+    }
+  });
+
+  input.addEventListener("input", function () {
+    feedback.textContent = "";
+    input.removeAttribute("aria-invalid");
+  });
+
+  function showReveal() {
+    revealed = true;
+    entryView.hidden = true;
+    reveal.hidden = false;
+    document.body.classList.add("revealed");
+    window.scrollTo(0, 0);
+    buildWall();
+    var link = wall.querySelector("a");
+    if (link) link.focus({ preventScroll: true });
+  }
+
+  function cell(text) {
+    var s = document.createElement("span");
+    s.textContent = text;
+    return s;
+  }
+
+  function buildWall() {
+    var w = window.innerWidth, h = window.innerHeight;
+    var cols = w < 520 ? 3 : w < 900 ? 4 : w < 1300 ? 5 : 6;
+    var pad = Math.round(w * 0.03);
+    var fs = (w - 2 * pad) / (cols * 2.5);
+    var rows = Math.max(3, Math.round(h / (fs * 1.15)));
+    var linkRow = Math.floor(rows / 2);
+    var label = DRIVE_LINK_LABEL;
+
+    wall.innerHTML = "";
+    wall.style.setProperty("--fs", fs + "px");
+    wall.style.setProperty("--pad", pad + "px");
+    wall.style.gridTemplateRows = "repeat(" + rows + ", 1fr)";
+
+    // Fit the link text: share a row with HBD if it fits, otherwise use a full row.
+    var hbdW = fs * 2.4;
+    var sharedAvail = w - 2 * pad - 2 * hbdW - 2 * fs * 0.3;
+    var sharedFs = Math.min(fs, sharedAvail / (label.length * 0.85 + 1));
+    var solo = sharedFs < fs * 0.5;
+    var linkFs = solo
+      ? Math.min(fs * 0.9, (w - 2 * pad) / (label.length * 0.85 + 1))
+      : sharedFs;
+
+    for (var r = 0; r < rows; r++) {
+      var row = document.createElement("div");
+      row.className = "row";
+      if (r === linkRow) {
+        var a = document.createElement("a");
+        a.textContent = label;
+        a.href = DRIVE_LINK_URL;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.style.fontSize = linkFs + "px";
+        // Until a real link is configured, the placeholder does nothing.
+        if (!/^https?:\/\//i.test(DRIVE_LINK_URL) || /\.invalid\//.test(DRIVE_LINK_URL)) {
+          a.addEventListener("click", function (ev) { ev.preventDefault(); });
+        }
+        if (solo) {
+          row.classList.add("solo");
+          row.appendChild(a);
+        } else {
+          row.appendChild(cell("HBD"));
+          row.appendChild(a);
+          row.appendChild(cell("HBD"));
+        }
+      } else {
+        for (var c = 0; c < cols; c++) row.appendChild(cell("HBD"));
+      }
+      wall.appendChild(row);
+    }
+  }
+
+  var resizeTimer;
+  window.addEventListener("resize", function () {
+    if (!revealed) return;
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(buildWall, 100);
+  });
+})();
+</script>
+</body>
+</html>
